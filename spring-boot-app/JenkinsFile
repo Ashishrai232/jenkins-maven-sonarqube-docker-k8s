@@ -24,13 +24,15 @@ pipeline {
         SONAR_URL = "http://48.217.68.185:9000/"
       }
       steps {
+        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+        sh '''
         apt-get update && apt-get install -y openjdk-17-jdk-headless
         update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java || true
         export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
         java -version
         mvn -v
-        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'cd  spring-boot-app/ && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+        cd  spring-boot-app/ && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}
+        '''
         }
       }
     }
